@@ -1,6 +1,6 @@
 /*
 Colliding, a simple SuperCollider environment for learning and live coding
-(c) Gerard Roma, 2013-2014
+(c) Gerard Roma, 2013-2017
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -93,7 +93,7 @@ CollidingBufferGUI{
 	fromFreesound{
 		var soundList,results=[],fileNames=[];
 		var y = Window.screenBounds.height - 120;
-		var w = Window("", Rect(300, y, 400, 600));
+		var w = Window("", Rect(300, y, 320, 600));
 		var searchBox = TextField(w, Rect(10, 10, 250, 30));
 		var searchButton =  Button(w,Rect(260, 10, 50, 30)).states_([["search"]]);
 		var loadButton =  Button(w,Rect(10, 550, 300, 30)).states_([["load"]]);
@@ -102,9 +102,10 @@ CollidingBufferGUI{
 			soundList.clear;
 			results=[];
 			fileNames=[];
-			FS2Sound.search(q:searchBox.string,f:"type:wav",action:{|p|
+			FSSound.textSearch(query:searchBox.string, filter:'duration:[0 TO 8]', params:('page_size':30), action:{|p|
+				p.postln;
 				p.do({|snd|
-					fileNames=fileNames.add(snd.original_filename);
+					fileNames=fileNames.add(snd.name);
 					results = results.add(snd);
 				});
 				soundList.items_(fileNames);
@@ -113,13 +114,12 @@ CollidingBufferGUI{
 
 			soundList = ListView(w,Rect(10, 50, 300, 500)).action_({|list|
 				//results[list.value].preview; TODO
-
 			});
 
 		   loadButton.action_({|b|
 				var i = soundList.value;
-			    var path = Platform.defaultTempDir++fileNames[i];
-				results[i].retrieve(Platform.defaultTempDir,
+			    var path = Platform.defaultTempDir++results[i].previewFilename;
+				results[i].retrievePreview(Platform.defaultTempDir,
 				{
 					app.buffers[bufNum] =
 				         Buffer.read(app.server,path,bufnum:bufNum,action:{

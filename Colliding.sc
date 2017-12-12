@@ -1,6 +1,6 @@
 /*
 Colliding, a simple SuperCollider environment for learning and live coding
-(c) Gerard Roma, 2013-2014
+(c) Gerard Roma, 2013-2017
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -58,7 +58,7 @@ Colliding{
         gui = CollidingGUI.new.init(this);
 		sclangPath=Platform.resourceDir++
 		           Platform.pathSeparator++"sclang";
-		if(aFreesoundKey.notNil){Freesound2.api_key_(aFreesoundKey)};
+		if(aFreesoundKey.notNil){Freesound.token = aFreesoundKey};
     }
 
 
