@@ -57,7 +57,12 @@ Colliding{
 		sounds = Array.fill(8);
         gui = CollidingGUI.new.init(this);
 		sclangPath=Platform.resourceDir++
-		           Platform.pathSeparator++"sclang";
+		           Platform.pathSeparator;
+		if (thisProcess.platform.name==\osx){
+				sclangPath = sclangPath ++"../MacOS/sclang";
+		}{
+			sclangPath = sclangPath ++"sclang";
+		};
 		if(aFreesoundKey.notNil){Freesound.token = aFreesoundKey};
     }
 
