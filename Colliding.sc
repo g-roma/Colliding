@@ -119,6 +119,11 @@ CollidingTrack{
 		synth = Synth(name,[\key,60,\freq,400,\amp,0.5,\gate,1]);
 	}
 
+	playNote{|name, note, velocity|
+		synth = Synth(name,[\key,note,\freq,note.midicps,\amp,velocity/127.0,\gate,1]);
+		^synth;
+	}
+
 	stop{
 		synth.free;
 	}
@@ -129,7 +134,7 @@ CollidingTrack{
 
 	makeDefStr{|str,name,play|
 		var defStr;
-		defStr = "SynthDef('"++name.asSymbol++"', {|key=60,freq=400,gate=1,amp=1| ";
+		defStr = "SynthDef('"++name.asSymbol++"', {|key=60,freq=400,gate=0,amp=1| ";
 		if(play){
 		 defStr = defStr +str+" }).play(Server.internal); ";
 		}{
@@ -153,6 +158,7 @@ CollidingControl{
     var <>view;
     var colorIsSet;
     var lineIsNew;
+	var synths;
     var <app;
 
 	*new{|app,player|
@@ -161,7 +167,23 @@ CollidingControl{
 
 	init{|anApp|
 		app = anApp;
+		this.initMIDI;
 	}
+
+	initMIDI{
+		MIDIClient.init;
+		MIDIIn.connectAll;
+		synths = Dictionary.new;
+		MIDIFunc.noteOn({|vel, key|
+			var tab = app.gui.tabs[app.gui.tabView.activeTab.index];
+			var name = "colliding_"++app.id++"_"++tab.id;
+			synths[key] = tab.track.playNote(name, key, vel);
+		});
+		MIDIFunc.noteOff({|vel, key|
+			synths[key].free;
+		});
+	}
+
 
 	tabKeyDown{|tab,view,char,mod,unicode,keycode|
 		var str;
