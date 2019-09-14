@@ -56,6 +56,7 @@ CollidingTab{
 			track.stop;
 			control.removeTab(this);
 		});
+		track.tab = this;
 		tab.focus;
 		tab.flow({|w|
 			textView=TextView(w,Rect(10,10,840,460))
@@ -65,7 +66,8 @@ CollidingTab{
 			};
 			volumeSlider = Slider(w,Rect(800,0,50,460)).action_({|v|
 				control.trackVolume(this,v);
-			}).value_(1);
+			}).value_(0.5);
+
 		    w.startRow;
 
 			compileButton = Button(w,Rect(905,10,50,30))

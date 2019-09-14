@@ -134,7 +134,8 @@ CollidingTrack{
 
 	makeDefStr{|str,name,play|
 		var defStr;
-		defStr = "SynthDef('"++name.asSymbol++"', {|key=60,freq=400,gate=0,amp=1| ";
+		var ampVal = spec.map(this.tab.volumeSlider.value).dbamp;
+		defStr = "SynthDef('"++name.asSymbol++"', {|key=60,freq=400,gate=0,amp="++ampVal++ "| ";
 		if(play){
 		 defStr = defStr +str+" }).play(Server.internal); ";
 		}{
@@ -180,12 +181,13 @@ CollidingControl{
 			synths[key] = tab.track.playNote(name, key, vel);
 		});
 		MIDIFunc.noteOff({|vel, key|
-			synths[key].free;
+			synths[key].set(\gate, 0);
 		});
 	}
 
 
 	tabKeyDown{|tab,view,char,mod,unicode,keycode|
+
 		var str;
 		var cmdK,returnK,backspaceK;
 		Platform.case( // TODO: linux
@@ -198,6 +200,20 @@ CollidingControl{
 				returnK,{ this.playTrack(tab,view)},
 				backspaceK,{ this.stopTrack(tab,view)}
 			);
+		};
+		if(mod==2228224){
+			keycode.switch(
+				126, {10.do({tab.volumeSlider.increment});
+					tab.volumeSlider.action.value},
+				125,{10.do({tab.volumeSlider.decrement});
+					tab.volumeSlider.action.value;
+
+				}
+
+			);
+
+
+
 		};
 		if((32..127).indexOf(unicode).notNil)
 		    {view.stringColor_(Color.grey)};
@@ -221,7 +237,7 @@ CollidingControl{
 	}
 
 	stopTrack{|tab,view|
-		tab.state = tab.prevState;
+		tab.state = 0;
 		tab.track.stop;
 	}
 
@@ -330,17 +346,19 @@ CollidingControl{
 
 	saveProject{
 		if(app.projectPath.isNil){
-			File.saveDialog("save project","",{|path|
+			FileDialog.new({|path|
+				path.postln;
 				path.mkdir;
 				path = path++"/";
-				path++"audio/".mkdir;
+				(path++"audio").postln;
+				(path++"audio").mkdir;
 
 				app.gui.tabs.do({|tab|
 					tab.save(path)}
 				);
 				app.projectPath = path;
 				this.saveBuffers(app.projectPath++"audio");
-			});
+			}, fileMode:2, acceptMode:1, stripResult:true);
 		}{
 			app.gui.tabs.do({|tab|tab.save(this.app.projectPath)});
 			this.saveBuffers(app.projectPath++"audio");
@@ -352,9 +370,9 @@ CollidingControl{
 		if(app.projectPath.isNil){
 			var content =app.gui.tabs.collect({|tab|tab.textView.string.size}).sum;
 			if(content==0){
-				File.openDialog("project",{|p|
+				FileDialog.new({|p|
 					this.load(p);
-				});
+				}, fileMode:2, acceptMode:0, stripResult:true);
 			}{
 			app.post("Already did some work");
 			}
@@ -363,10 +381,8 @@ CollidingControl{
 		}
 	}
 
-	load{|p|
-		var folder,a,textFiles;
-		a=p.findAll("/");
-		folder = p[0..a[a.size-1]];
+	load{|folder|
+		var textFiles;
 		app.projectPath_(folder);
 		app.gui.removeFirst;
 		app.tabId=0;
