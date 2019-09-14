@@ -108,7 +108,7 @@ CollidingBufferGUI{
 					fileNames=fileNames.add(snd.name);
 					results = results.add(snd);
 				});
-				soundList.items_(fileNames);
+				{soundList.items_(fileNames)}.defer;
 			});
 			});
 
