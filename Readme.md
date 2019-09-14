@@ -3,14 +3,14 @@ Colliding
 A simplified environment for learning and live coding
 
 
-###requirements
+### requirements
 
 - Freesound2
 
 - TabbedView2
 
 
-###motivation
+### motivation
 
 Supercollider is an incredibly powerful environment, but sometimes a more constrained interface can be useful. Colliding is a simplified environment for learning and playing with SuperCollider, it tries to avoid one of the major sources of confusion for beginners: aynchronous operations happening between language and server. Many of these are implemented through a graphical interface. This simplicity is also useful for live situations, so that the live coder can focus on sound generation. Colliding is currently focused on building synthdefs, although an experimental "advanced" mode allows any playable code to be run via NodeProxy. Other restrictions include: there is only one Server (internal), and up to 8 tabs and 8 buffers can be used. 
 
