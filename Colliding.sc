@@ -24,9 +24,9 @@ Colliding{
 	classvar <>symbolFont;
 
 	classvar <instanceId = 0;
-	classvar <max_tabs = 8;
+	classvar <maxTabs = 8;
 
-	var <id,>tabId;
+	var <id, >tabId;
     var <>gui, <>server, <controller;
 	var <>buffers, <>sounds;
 	var <projectPath;
@@ -34,7 +34,7 @@ Colliding{
 	var <sclangPath;
 
 	*new{|mode = 0,freesound_key = nil|
-		^super.new.init(mode,freesound_key);
+		^super.new.init(mode, freesound_key);
     }
 
 	tabId{
