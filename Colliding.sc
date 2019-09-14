@@ -32,9 +32,10 @@ Colliding{
 	var <projectPath;
     var <mode = 0;
 	var <sclangPath;
+	var <config;
 
-	*new{|mode = 0,freesound_key = nil|
-		^super.new.init(mode, freesound_key);
+	*new{|configFile|
+		^super.new.init(configFile);
     }
 
 	tabId{
@@ -42,11 +43,11 @@ Colliding{
 		^tabId;
 	}
 
-    init{|aMode,aFreesoundKey|
+    init{|configFile|
+		config = CollidingConfig.new(configFile);
 		textFont = Font("Verdana", 24);
 	    guiFont = Font("Arial", 12);
 	    symbolFont = Font("Arial", 28);
-		mode = aMode;
 		tabId = 0;
 		instanceId = instanceId + 1;
 		id = instanceId;
@@ -56,15 +57,24 @@ Colliding{
 		buffers = Array.fill(8);
 		sounds = Array.fill(8);
         gui = CollidingGUI.new.init(this);
-		sclangPath = Platform.resourceDir++
-		             Platform.pathSeparator;
-		if (thisProcess.platform.name==\osx){
-				sclangPath = sclangPath ++"../MacOS/sclang";
+		if(config.sclangPath.isEmpty){
+			sclangPath = this.getSCLangPath;
 		}{
-			sclangPath = sclangPath ++ "sclang";
+			sclangPath = config.sclangPath;
 		};
-		if(aFreesoundKey.notNil){Freesound.token = aFreesoundKey};
+		if(config.freesoundKey.isEmpty.not){Freesound.token = config.freesoundKey};
+		if(config.useNodeProxy) {mode = 1};
     }
+
+	getSCLangPath{
+		var path = Platform.resourceDir ++ Platform.pathSeparator;
+		if (thisProcess.platform.name == \osx){
+				path = path ++"../MacOS/sclang";
+		}{
+			path = path ++ "sclang";
+		};
+		^path;
+	}
 
 
 	post{|str|
