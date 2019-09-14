@@ -40,7 +40,7 @@ CollidingControl{
 		synths = Dictionary.new;
 		MIDIFunc.noteOn({|vel, key|
 			var tab = app.gui.tabs[app.gui.tabView.activeTab.index];
-			var name = "colliding_"++app.id++"_"++tab.id;
+			var name = "colliding_" ++ app.id ++ "_" ++ tab.id;
 			synths[key] = tab.track.playNote(name, key, vel);
 		});
 		MIDIFunc.noteOff({|vel, key|
@@ -54,43 +54,41 @@ CollidingControl{
 		var str;
 		var cmdK,returnK,backspaceK;
 		Platform.case( // TODO: linux
-			\osx,{cmdK = 1048576; returnK=36; backspaceK = 51},
-			\windows,{ cmdK = 262144; returnK=13; backspaceK = 8},
-			\linux,{ cmdK = 262144; returnK=36; backspaceK = 22}
+			\osx,{cmdK = 1048576; returnK = 36; backspaceK = 51},
+			\windows,{ cmdK = 262144; returnK = 13; backspaceK = 8},
+			\linux,{ cmdK = 262144; returnK = 36; backspaceK = 22}
 		);
+
 		if(mod==cmdK){
 			keycode.switch(
 				returnK,{ this.playTrack(tab,view)},
 				backspaceK,{ this.stopTrack(tab,view)}
 			);
 		};
+
 		if(mod==2228224){
 			keycode.switch(
 				126, {10.do({tab.volumeSlider.increment});
 					tab.volumeSlider.action.value},
 				125,{10.do({tab.volumeSlider.decrement});
 					tab.volumeSlider.action.value;
-
 				}
-
 			);
-
-
-
 		};
+
 		if((32..127).indexOf(unicode).notNil)
 		    {view.stringColor_(Color.grey)};
 	}
 
 	playTrack{|tab, view|
 		if(app.mode == 0){// synthdef
-			this.compile(tab,view,true);
+			this.compile(tab, view, true);
 		}{ // nodeproxy
 			var parsed = tab.track.parse(view.string);
 			if (parsed.notNil){
 				view.stringColor_(Color.white);
 				tab.track.playStr(parsed);
-				tab.state=1;
+				tab.state = 1;
 			}{
 				view.stringColor_(Color.red);
 			}
@@ -103,14 +101,14 @@ CollidingControl{
 		tab.track.stop;
 	}
 
-    compile{|tab,view,play = false|
+    compile{|tab, view, play = false|
 		var def;
 		var name = "colliding_" ++ app.id ++ "_" ++ tab.id;
-		var defStr = tab.track.makeDefStr(tab.textView.string,name,play);
+		var defStr = tab.track.makeDefStr(tab.textView.string, name, play);
 		tab.post("compiling");
 
 		try{
-			def = tab.track.makeDef(defStr,name,play);
+			def = tab.track.makeDef(defStr, name, play);
 		};
 
 		if (def.notNil){
@@ -123,16 +121,16 @@ CollidingControl{
 		}{
 			view.stringColor_(Color.red);
 			tab.post("ERROR");
-			this.postErr(name,defStr,tab,view);
+			this.postErr(name, defStr, tab, view);
 		};
 		//app.gui.updateScope;
 		^def.notNil;
 	}
 
-	postErr{|name,str,tab,view|
-		var def,tmpFile,tmpFileName,cmdStr,resultLines,lineNum;
+	postErr{|name, str, tab, view|
+		var def, tmpFile, tmpFileName, cmdStr, resultLines, lineNum;
 		tmpFileName = Platform.defaultTempDir ++ name;
-		tmpFile = File.use(tmpFileName,"w+",{|f|
+		tmpFile = File.use(tmpFileName,"w+", {|f|
 			f.write("protect{\"" ++ str ++ "\".compile.value}{0.exit}")});
 		cmdStr = app.sclangPath ++ " " ++ tmpFileName;
 		resultLines = cmdStr.unixCmdGetStdOutLines;

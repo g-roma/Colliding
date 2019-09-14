@@ -18,9 +18,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 CollidingTrack{
-	var <>str, <>synth,<playing = false,compiled;
+	var <>str, <>synth, <playing = false,compiled;
 	var parsed = false;
-	var spec,<>name,<vol;
+	var spec, <>name, <vol;
 	var <>tab;
 
 	*new{^super.new.init}
@@ -35,8 +35,9 @@ CollidingTrack{
 		str = str.compile;
 	    ^str;
    }
+
    playStr{|str|
-		synth.source=str;
+		synth.source = str;
 		synth.play;
 		if(playing.not){
 			playing=true;
@@ -44,11 +45,11 @@ CollidingTrack{
 	}
 
 	play{|name|
-		synth = Synth(name,[\key,60,\freq,400,\amp,0.5,\gate,1]);
+		synth = Synth(name,[\key, 60, \freq, 400, \amp, 0.5, \gate, 1]);
 	}
 
 	playNote{|name, note, velocity|
-		synth = Synth(name,[\key,note,\freq,note.midicps,\amp,velocity/127.0,\gate,1]);
+		synth = Synth(name,[\key, note, \freq, note.midicps, \amp, velocity / 127.0, \gate, 1]);
 		^synth;
 	}
 
@@ -57,24 +58,24 @@ CollidingTrack{
 	}
 
     vol_{|val|
-		synth.set(\amp,spec.map(val).dbamp);
+		synth.set(\amp, spec.map(val).dbamp);
 	}
 
 	makeDefStr{|str, name, play|
 		var defStr;
 		var ampVal = spec.map(this.tab.volumeSlider.value).dbamp;
-		defStr = "SynthDef('"++name.asSymbol++"', {|key=60,freq=400,gate=0,amp="++ampVal++ "| ";
+		defStr = "SynthDef('" ++ name.asSymbol ++ "', {|key=60,freq=400,gate=0,amp=" ++ ampVal ++ "| ";
 		if(play){
-		 defStr = defStr +str+" }).play(Server.internal); ";
+		 defStr = defStr + str + " }).play(Server.internal); ";
 		}{
-		 defStr = defStr +str+" }).send(Server.internal); ";
+		 defStr = defStr + str +" }).send(Server.internal); ";
 		};
 		^defStr;
 	}
 
 	makeDef{|defStr, name, play = false|
 		var def = defStr.compile.value;
-		if(play){synth.free;synth=def};
+		if(play){synth.free;synth = def};
 		this.name = name;
 		^def;
 	}
